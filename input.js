@@ -1,25 +1,8 @@
-import { thePicker } from './picker.js';
+import {thePicker} from './picker.js';
 import locales from './locales.js';
 
 export default class Input {
   constructor(input) {
-    const formatLocalDate => (d) {
-      const tzo = -d.getTimezoneOffset(),
-        dif = tzo >= 0 ? '+' : '-',
-        pad = (num) => {
-          const norm = Math.abs(Math.floor(num));
-          return (norm < 10 ? '0' : '') + norm;
-        };
-      return d.getFullYear()
-        + '-' + pad(d.getMonth()+1)
-        + '-' + pad(d.getDate())
-        + 'T' + pad(d.getHours())
-        + ':' + pad(d.getMinutes())
-        + ':' + pad(d.getSeconds())
-        + dif + pad(tzo / 60)
-        + ':' + pad(tzo % 60);
-    }
-
     this.element = input;
     this.element.setAttribute(`data-has-picker`, ``);
 
@@ -35,7 +18,7 @@ export default class Input {
       {
         'valueAsDate': {
           get: ()=> {
-            if(!this.element.value) {
+            if (!this.element.value) {
               return null;
             }
 
@@ -43,12 +26,12 @@ export default class Input {
             return new Date(`${val[0]}-${`0${val[1]}`.slice(-2)}-${`0${val[2]}`.slice(-2)}`);
           },
           set: val=> {
-            this.element.value = formatLocalDate(val).slice(0,10);
+            this.element.value = this.formatLocalDate(val).slice(0, 10);
           }
         },
         'valueAsNumber': {
           get: ()=> {
-            if(!this.element.value) {
+            if (!this.element.value) {
               return NaN;
             }
 
@@ -74,19 +57,19 @@ export default class Input {
     this.element.addEventListener(`keydown`, e=> {
       const date = new Date();
 
-      switch(e.keyCode) {
+      switch (e.keyCode) {
         case 27:
           thePicker.hide();
           break;
         case 38:
-          if(this.element.valueAsDate) {
+          if (this.element.valueAsDate) {
             date.setDate(this.element.valueAsDate.getDate() + 1);
             this.element.valueAsDate = date;
             thePicker.pingInput();
           }
           break;
         case 40:
-          if(this.element.valueAsDate) {
+          if (this.element.valueAsDate) {
             date.setDate(this.element.valueAsDate.getDate() - 1);
             this.element.valueAsDate = date;
             thePicker.pingInput();
@@ -100,16 +83,33 @@ export default class Input {
     });
   }
 
+  formatLocalDate(d) {
+    const tzo = -d.getTimezoneOffset(),
+      dif = tzo >= 0 ? '+' : '-',
+      pad = (num) => {
+        const norm = Math.abs(Math.floor(num));
+        return (norm < 10 ? '0' : '') + norm;
+      };
+    return d.getFullYear()
+      + '-' + pad(d.getMonth() + 1)
+      + '-' + pad(d.getDate())
+      + 'T' + pad(d.getHours())
+      + ':' + pad(d.getMinutes())
+      + ':' + pad(d.getSeconds())
+      + dif + pad(tzo / 60)
+      + ':' + pad(tzo % 60);
+  }
+
   getLocaleText() {
     const locale = this.locale.toLowerCase();
 
-    for(const localeSet in locales) {
+    for (const localeSet in locales) {
       const localeList = localeSet.split(`_`);
       localeList.map(el=>el.toLowerCase());
 
-      if(
+      if (
         !!~localeList.indexOf(locale)
-        || !!~localeList.indexOf(locale.substr(0,2))
+        || !!~localeList.indexOf(locale.substr(0, 2))
       ) {
         return locales[localeSet];
       }
@@ -133,11 +133,11 @@ export default class Input {
     const dateInputs = document.querySelectorAll(`input[type="date"]:not([data-has-picker])`);
     const length = dateInputs.length;
 
-    if(!length) {
+    if (!length) {
       return false;
     }
 
-    for(let i = 0; i < length; ++i) {
+    for (let i = 0; i < length; ++i) {
       new Input(dateInputs[i]);
     }
   }
