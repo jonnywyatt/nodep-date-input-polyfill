@@ -3,6 +3,23 @@ import locales from './locales.js';
 
 export default class Input {
   constructor(input) {
+    const formatLocalDate => (d) {
+      const tzo = -d.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = (num) => {
+          const norm = Math.abs(Math.floor(num));
+          return (norm < 10 ? '0' : '') + norm;
+        };
+      return d.getFullYear()
+        + '-' + pad(d.getMonth()+1)
+        + '-' + pad(d.getDate())
+        + 'T' + pad(d.getHours())
+        + ':' + pad(d.getMinutes())
+        + ':' + pad(d.getSeconds())
+        + dif + pad(tzo / 60)
+        + ':' + pad(tzo % 60);
+    }
+
     this.element = input;
     this.element.setAttribute(`data-has-picker`, ``);
 
@@ -26,7 +43,7 @@ export default class Input {
             return new Date(`${val[0]}-${`0${val[1]}`.slice(-2)}-${`0${val[2]}`.slice(-2)}`);
           },
           set: val=> {
-            this.element.value = val.toISOString().slice(0,10);
+            this.element.value = formatLocalDate(val).slice(0,10);
           }
         },
         'valueAsNumber': {
